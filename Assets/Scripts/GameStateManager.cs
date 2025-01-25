@@ -1,13 +1,17 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.SceneManagement;
 
 public class GameStateManager : MonoBehaviour
 {
+    private UIInputActions inputActions;
+
     public static GameStateManager instance { get; private set; }
 
     private bool gameOver = false;
     private Player winningPlayer;
 
-    [SerializeField]
     private GameOverScreen gameOverScreen;
 
     private void Awake()
@@ -23,25 +27,50 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        inputActions = new UIInputActions();
+        inputActions.UI.Enable();
+
+        inputActions.UI.Restart.performed += OnRestart;
+    }
+
+    private void OnDestroy()
+    {
+        inputActions.UI.Restart.performed -= OnRestart;
+    }
+
 
     public void OnPlayerLoose(Player player)
     {
         if (player == Player.Player1)
         {
-            this.winningPlayer = Player.Player2;
+            winningPlayer = Player.Player2;
             SoundController.Instance.PlaySound(SfxIdentifier.Player2Wins);
         }
         else
         {
-            this.winningPlayer = Player.Player1;
+            winningPlayer = Player.Player1;
             SoundController.Instance.PlaySound(SfxIdentifier.Player1Wins);
         }
 
         gameOver = true;
         Time.timeScale = 0;
 
+        gameOverScreen = (GameOverScreen)GameObject.FindObjectOfType(typeof(GameOverScreen));
+
         Debug.Log("Player Won: " + winningPlayer.ToString());
         gameOverScreen.OnGameOver(winningPlayer);
+    }
+
+    private void OnRestart(InputAction.CallbackContext input)
+    {
+        if (!gameOver) return;
+
+        gameOver = false;
+        Time.timeScale = 1;
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
 }
