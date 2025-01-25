@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
 {
-    
-    private Player2InputActions inputActions;
+    private PlayerInput playerInput;
+    InputAction moveAction;
+    InputAction aimAction;
 
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
@@ -27,12 +28,14 @@ public class Movement : MonoBehaviour
 
     void Start()
     {
-        inputActions = new Player2InputActions();
-        inputActions.Player.Enable();
+        playerInput = GetComponent<PlayerInput>();
+        playerInput.currentActionMap.Enable();
+
+        moveAction = playerInput.actions["Move"];
+        aimAction = playerInput.actions["Aim"];
 
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
-        inputActions.Player.Jump.performed += OnJump;
     }
 
     void Update()
@@ -48,14 +51,12 @@ public class Movement : MonoBehaviour
         else _canJump = false;
     }
 
-    private void OnDestroy()
-    {
-        inputActions.Player.Shoot.performed -= OnJump;
-    }
-
-    private void OnJump(InputAction.CallbackContext input)
+    public void OnJump()
     {
         Debug.Log("OnJump");
+
+        if (!_canJump) return;
+
         _canWalk = false;
         _isJump = true;
     }
@@ -64,7 +65,7 @@ public class Movement : MonoBehaviour
     {
         Mirror();
 
-        Vector2 inputVector = inputActions.Player.Move.ReadValue<Vector2>();
+        Vector2 inputVector = moveAction.ReadValue<Vector2>();
 
         Move(inputVector);
 
@@ -79,7 +80,7 @@ public class Movement : MonoBehaviour
 
     private void Mirror()
     {
-        Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
+        Vector2 inputVector = aimAction.ReadValue<Vector2>();
         Vector2 mousePosition = mainCamera.ScreenToWorldPoint(inputVector);
 
         mousePosition.Normalize();

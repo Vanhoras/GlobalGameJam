@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 public class ShootBubble : MonoBehaviour
 {
 
-    private Player2InputActions inputActions;
+    PlayerInput playerInput;
+    InputAction aimAction;
 
     [SerializeField]
     private GameObject _bullet;
@@ -13,19 +14,15 @@ public class ShootBubble : MonoBehaviour
 
     private void Start()
     {
-        inputActions = new Player2InputActions();
-        inputActions.Player.Enable();
-        inputActions.Player.Shoot.performed += OnShoot;
+        playerInput = GetComponent<PlayerInput>();
+        playerInput.currentActionMap.Enable();
+
+        aimAction = playerInput.actions["Aim"];
     }
 
-    private void OnDestroy()
-    {
-        inputActions.Player.Shoot.performed -= OnShoot;
-    }
+    public void OnShoot() {
 
-    private void OnShoot(InputAction.CallbackContext input) {
-
-        Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
+        Vector2 inputVector = aimAction.ReadValue<Vector2>();
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);
 
         Vector2 shootDirection = mousePosition - (Vector2) transform.position;
