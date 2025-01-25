@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.SceneManagement;
 
 public class GameStateManager : MonoBehaviour
@@ -13,6 +12,8 @@ public class GameStateManager : MonoBehaviour
     private Player winningPlayer;
 
     private GameOverScreen gameOverScreen;
+
+    int[] arenas = new[] { 0, 1, 2, 3 };
 
     private void Awake()
     {
@@ -70,7 +71,13 @@ public class GameStateManager : MonoBehaviour
         gameOver = false;
         Time.timeScale = 1;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
+        nextScene = nextScene > arenas[arenas.Length - 1] ? arenas[0] : nextScene;
+
+        Debug.Log(nextScene);
+        Debug.Log(SceneManager.sceneCount);
+
+        SceneManager.LoadScene(nextScene);
     }
 
 }
