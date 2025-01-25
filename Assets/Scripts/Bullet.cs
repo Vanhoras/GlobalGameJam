@@ -2,6 +2,13 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    private enum CollisionTarget
+    {
+        Level,
+        PlayerHead,
+        Nothing
+    }
+
     [SerializeField]
     float speed = 20;
 
@@ -14,19 +21,29 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        handleHeadCollision(collision, out var shouldDestroy);
+        handleHeadCollision(collision, out var collisionTarget);
 
-        if (shouldDestroy)
+        if(collisionTarget == CollisionTarget.Level)
+        {
+            SoundController.Instance.PlaySound(SfxIdentifier.BubbleWallPop);
+        }
+
+        if (collisionTarget == CollisionTarget.PlayerHead)
+        {
+            SoundController.Instance.PlaySound(SfxIdentifier.BubblePlayerHit);
+        }
+
+        if (collisionTarget != CollisionTarget.Nothing)
         {
             Destroy(gameObject);
         }
     }
 
-    private void handleHeadCollision(Collider2D collision, out bool shouldDestroy)
+    private void handleHeadCollision(Collider2D collision, out CollisionTarget collisionTarget)
     {
         if (collision.gameObject.tag != "Player")
         {
-            shouldDestroy = true;
+            collisionTarget = CollisionTarget.Level;
             return;
         }
 
@@ -34,17 +51,17 @@ public class Bullet : MonoBehaviour
 
         if (head == null)
         {
-            shouldDestroy = false;
+            collisionTarget = CollisionTarget.Nothing;
             return;
         }
 
         if (head.Player == Origin)
         {
-            shouldDestroy = false;
+            collisionTarget = CollisionTarget.Nothing;
             return;
         }
 
-        shouldDestroy = true;
+        collisionTarget = CollisionTarget.PlayerHead;
         head.OnBulletHit(this);
     }
 }

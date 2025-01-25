@@ -79,7 +79,7 @@ public partial class @Player1InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""f94b7a84-c3ce-470f-8c52-be5ab962ee68"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -90,7 +90,7 @@ public partial class @Player1InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""50ada3df-fad3-4af4-810d-33dcb0eca5ac"",
-                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

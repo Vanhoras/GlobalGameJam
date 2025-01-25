@@ -9,8 +9,11 @@ public enum SfxIdentifier
     Shoot,
     BubbleWallPop,
     BubblePlayerHit,
-    Player1Win,
-    Player2Win
+    Player1Wins,
+    Player2Wins,
+    Powerup,
+    UiConfirm,
+    UiDecline,
 }
 
 [Serializable]
@@ -27,6 +30,9 @@ public class SoundController : MonoBehaviour
 
     [SerializeField]
     private AudioSource audioSource;
+
+    [SerializeField]
+    private bool logging;
 
     private static SoundController instance;
 
@@ -47,7 +53,13 @@ public class SoundController : MonoBehaviour
                 return;
             }
 
-            audioSource.PlayOneShot(entry.AudioClip);
+            if (logging)
+            {
+                Debug.Log("Playing " + key);
+                audioSource.PlayOneShot(entry.AudioClip);
+            }
+
+            return;
         }
 
         Debug.LogError("No audio clip with key " + key + " can be found");
