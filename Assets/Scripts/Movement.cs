@@ -26,7 +26,6 @@ public class Movement : MonoBehaviour
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
     private RaycastHit2D[] _hit;
-
     void Start()
     {
         _player = GetComponent<PlayerMetadata>();
@@ -59,7 +58,6 @@ public class Movement : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext input)
     {
-
         _hit = Physics2D.LinecastAll(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), new Vector2(groundCast.position.x, groundCast.position.y - 0.2f));
 
         foreach (RaycastHit2D hit in _hit)
@@ -77,12 +75,13 @@ public class Movement : MonoBehaviour
         _canJump = false;
         _canWalk = false;
         _isJump = true;
+
+        SoundController.Instance.PlaySound(SfxIdentifier.Jump);
     }
 
     void FixedUpdate()
     {
         Mirror();
-
         Move();
 
         if (_isJump)
