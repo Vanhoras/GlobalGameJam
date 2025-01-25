@@ -65,6 +65,7 @@ public class ShootBubble : MonoBehaviour
         bullet.transform.right = shootDirection;
         bullet.transform.localScale = defaultScale + defaultScale * 0.5f * (_player.Health.MaxHealth / Mathf.Max(1,((float)_player.Health.CurrentHealth)));
         bullet.Origin = _player.Player;
+        bullet.Direction = shootDirection.x >= 0 ? 1 : -1;
 
         SoundController.Instance.PlaySound(SfxIdentifier.Shoot);
     }

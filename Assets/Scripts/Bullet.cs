@@ -15,6 +15,8 @@ public class Bullet : MonoBehaviour
     [SerializeField]
     public float knockbackForce = 2;
 
+    public int Direction;
+
     public Player Origin { get; set; } = Player.Player1;
 
     void Update()
