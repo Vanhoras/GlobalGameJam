@@ -2,6 +2,9 @@
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
+
+    private Player1InputActions inputActions;
+
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Transform gun;
@@ -19,11 +22,13 @@ public class Player : MonoBehaviour {
     private float _gunRotation;
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
-    private Vector2 _inputAxis;
     private RaycastHit2D _hit;
 
 	void Start ()
     {
+        inputActions = new Player1InputActions();
+        inputActions.Player.Enable();
+
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
 	}
@@ -39,20 +44,39 @@ public class Player : MonoBehaviour {
             }
         }
         else _canJump = false;
+    }
 
-        _inputAxis = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (_inputAxis.y > 0 && _canJump)
-        {
-            _canWalk = false;
-            _isJump = true;
-        }
+    private void OnJump()
+    {
+        Debug.Log("OnJump");
+        _canWalk = false;
+        _isJump = true;
     }
 
     void FixedUpdate()
     {
-        Vector3 dir = playerCamera.ScreenToWorldPoint(Input.mousePosition) - gun.transform.position;
-        dir.Normalize();
+        Aim();
+
+        Vector2 inputVector = inputActions.Player.Move.ReadValue<Vector2>();
+
+        Move(inputVector);
+
+        if (_isJump)
+        {
+            _playerRigidbody.AddForce(new Vector2(0, jumpForce));
+            // TODO: Play Jump Animation
+            _canJump = false;
+            _isJump = false;
+        }
+    }
+
+    private void Aim()
+    {
+        Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
+        Vector2 mousePosition = playerCamera.ScreenToWorldPoint(inputVector) - gun.transform.position;
+
+        mousePosition.Normalize();
 
         if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
             _isMirrored = false;
@@ -61,20 +85,24 @@ public class Player : MonoBehaviour {
 
         if (!_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(_startScale, _startScale, 1);
             gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
         if (_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(-dir.y, -dir.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(-mousePosition.y, -mousePosition.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(-_startScale, _startScale, 1);
             gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
+    }
 
-        if (_inputAxis.x != 0)
+
+    private void Move(Vector2 inputVector)
+    {
+        if (inputVector.x != 0)
         {
-            _playerRigidbody.velocity = new Vector2(_inputAxis.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);
+            _playerRigidbody.velocity = new Vector2(inputVector.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);
 
             if (_canWalk)
             {
@@ -84,14 +112,6 @@ public class Player : MonoBehaviour {
         else
         {
             _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
-        }
-
-        if (_isJump)
-        {
-            _playerRigidbody.AddForce(new Vector2(0, jumpForce));
-            // TODO: Play Jump Animation
-            _canJump = false;
-            _isJump = false;
         }
     }
 
