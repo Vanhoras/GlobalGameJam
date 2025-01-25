@@ -42,6 +42,13 @@ public class Health : MonoBehaviour
         if (playerRigidbody.gravityScale <= 0)
         {
             playerRigidbody.gravityScale = -1;
+
+            Collider2D[] colliders = GetComponentsInChildren<Collider2D>();
+
+            foreach (var collider in colliders)
+            {
+                collider.enabled = false;
+            }
         }
     }
 }
