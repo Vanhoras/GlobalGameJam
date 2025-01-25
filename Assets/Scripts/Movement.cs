@@ -164,7 +164,6 @@ public class Movement : MonoBehaviour
 
     public void Knockback(float force)
     {
-        Debug.Log("Knockback " + force);
         _playerRigidbody.AddForce(new Vector2(-force, 0));
     }
 }
