@@ -12,6 +12,9 @@ public class Bullet : MonoBehaviour
     [SerializeField]
     float speed = 20;
 
+    [SerializeField]
+    public float knockbackForce = 2;
+
     public Player Origin { get; set; } = Player.Player1;
 
     void Update()
