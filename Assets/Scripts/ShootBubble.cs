@@ -3,13 +3,10 @@ using UnityEngine.InputSystem;
 
 public class ShootBubble : MonoBehaviour
 {
-
     private Player2InputActions inputActions;
 
     [SerializeField]
     private GameObject _bullet;
-
-
 
     private void Start()
     {
@@ -27,7 +24,6 @@ public class ShootBubble : MonoBehaviour
 
         Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);
-
         Vector2 shootDirection = mousePosition - (Vector2) transform.position;
 
         Debug.Log(shootDirection);
