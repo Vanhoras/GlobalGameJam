@@ -11,7 +11,6 @@ public class Movement : MonoBehaviour
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Transform groundCast;
-    [SerializeField] private Camera mainCamera;
 
     private PlayerMetadata _player;
 
