@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class ShootBubble : MonoBehaviour
 {
 
-    private Player1InputActions inputActions;
+    private Player2InputActions inputActions;
 
     [SerializeField]
     private GameObject _bullet;
@@ -13,7 +13,7 @@ public class ShootBubble : MonoBehaviour
 
     private void Start()
     {
-        inputActions = new Player1InputActions();
+        inputActions = new Player2InputActions();
         inputActions.Player.Enable();
         inputActions.Player.Shoot.performed += OnShoot;
     }
