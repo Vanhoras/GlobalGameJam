@@ -9,6 +9,8 @@ public enum SfxIdentifier
     Shoot,
     BubbleWallPop,
     BubblePlayerHit,
+    Player1Win,
+    Player2Win
 }
 
 [Serializable]
