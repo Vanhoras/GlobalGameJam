@@ -144,8 +144,6 @@ public class Movement : MonoBehaviour
 
         if (inputVector.x != 0)
         {
-            
-            Debug.Log(healthSlowdown);
             _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce * healthSlowdown, 0));
 
             if (_canWalk)
