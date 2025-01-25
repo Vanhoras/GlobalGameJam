@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ShootBubble : MonoBehaviour
 {
@@ -14,9 +15,15 @@ public class ShootBubble : MonoBehaviour
     {
         inputActions = new Player1InputActions();
         inputActions.Player.Enable();
+        inputActions.Player.Shoot.performed += OnShoot;
     }
 
-    private void OnShoot() {
+    private void OnDestroy()
+    {
+        inputActions.Player.Shoot.performed -= OnShoot;
+    }
+
+    private void OnShoot(InputAction.CallbackContext input) {
 
         Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);

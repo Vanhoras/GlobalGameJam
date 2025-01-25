@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -31,6 +32,7 @@ public class Movement : MonoBehaviour
 
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
+        inputActions.Player.Jump.performed += OnJump;
     }
 
     void Update()
@@ -46,8 +48,12 @@ public class Movement : MonoBehaviour
         else _canJump = false;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Player.Shoot.performed -= OnJump;
+    }
 
-    private void OnJump()
+    private void OnJump(InputAction.CallbackContext input)
     {
         Debug.Log("OnJump");
         _canWalk = false;
@@ -56,7 +62,7 @@ public class Movement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Rotate();
+        Mirror();
 
         Vector2 inputVector = inputActions.Player.Move.ReadValue<Vector2>();
 
@@ -71,16 +77,16 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void Rotate()
+    private void Mirror()
     {
         Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
-        Vector2 mousePosition = playerCamera.ScreenToWorldPoint(inputVector) - gun.transform.position;
+        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(inputVector);
 
         mousePosition.Normalize();
 
-        if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
+        if (mousePosition.x > transform.position.x + 0.2f)
             _isMirrored = false;
-        if (mainCamera.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x - 0.2f)
+        if (mousePosition.x < transform.position.x - 0.2f)
             _isMirrored = true;
 
         if (!_isMirrored)
