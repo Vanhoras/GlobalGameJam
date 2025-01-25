@@ -55,8 +55,8 @@ public class Movement : MonoBehaviour
 
     private void OnDestroy()
     {
-        inputActions1.Player.Shoot.performed -= OnJump;
-        inputActions2.Player.Shoot.performed -= OnJump;
+        inputActions1.Player.Jump.performed -= OnJump;
+        inputActions2.Player.Jump.performed -= OnJump;
     }
 
     private void OnJump(InputAction.CallbackContext input)
@@ -178,7 +178,6 @@ public class Movement : MonoBehaviour
 
     public void Knockback(float force, int direction)
     {
-        Debug.Log("Knockback " + force);
         _playerRigidbody.AddForce(new Vector2(direction * force, 0));
     }
 }
