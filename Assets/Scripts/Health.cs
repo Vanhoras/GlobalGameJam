@@ -1,3 +1,5 @@
+using Pixelplacement;
+using Pixelplacement.TweenSystem;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -33,7 +35,8 @@ public class Health : MonoBehaviour
 
     private void UpdateHeadSize()
     {
-        headTransform.localScale = Vector3.one * (1 + _bulletsTaken / 5f);
+        var newSize = Vector3.one * (1 + _bulletsTaken / 5f);
+        Tween.LocalScale(headTransform, newSize, 0.1f, 0, Tween.EaseOutBack);
     }
 
     private void UpdateGravity()

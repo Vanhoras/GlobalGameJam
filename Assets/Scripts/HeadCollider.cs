@@ -1,3 +1,4 @@
+using SmoothShakeFree;
 using UnityEngine;
 
 public class HeadCollider : MonoBehaviour
@@ -22,6 +23,7 @@ public class HeadCollider : MonoBehaviour
         }
 
         movement.Knockback(bullet.knockbackForce, bullet.Direction);
+        Camera.main.GetComponent<ShakeBase>().StartShake();
 
         _health.OnBulletHit();
     }

@@ -37,7 +37,6 @@ public class Bullet : MonoBehaviour
         if (collisionTarget == CollisionTarget.PlayerHead)
         {
             SoundController.Instance.PlaySound(SfxIdentifier.BubblePlayerHit);
-            Camera.main.GetComponent<ShakeBase>().StartShake();
         }
 
         if (collisionTarget != CollisionTarget.Nothing)
