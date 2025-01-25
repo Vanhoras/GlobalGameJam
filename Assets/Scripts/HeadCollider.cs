@@ -8,6 +8,9 @@ public class HeadCollider : MonoBehaviour
     [SerializeField]
     private PlayerMetadata _player;
 
+    [SerializeField]
+    private Movement movement;
+
     public Player Player => _player.Player;
 
     public void OnBulletHit(Bullet bullet)
@@ -17,6 +20,8 @@ public class HeadCollider : MonoBehaviour
         {
             return;
         }
+
+        movement.Knockback(bullet.knockbackForce);
 
         _health.OnBulletHit();
     }
