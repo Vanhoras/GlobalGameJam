@@ -140,9 +140,13 @@ public class Movement : MonoBehaviour
             inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
         }
 
+        float healthSlowdown = Mathf.Lerp(0.6f, 1, (((float)_player.Health.CurrentHealth) / _player.Health.MaxHealth));
+
         if (inputVector.x != 0)
         {
-            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
+            
+            Debug.Log(healthSlowdown);
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce * healthSlowdown, 0));
 
             if (_canWalk)
             {
@@ -159,10 +163,10 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
+        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed * healthSlowdown)
         {
             int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
-            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
+            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed * healthSlowdown, _playerRigidbody.velocity.y);
         }
     }
 
