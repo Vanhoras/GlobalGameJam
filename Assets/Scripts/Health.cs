@@ -5,6 +5,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField]
     private int startHealth = 5;
+    private int _bulletsTaken;
 
     [SerializeField]
     private Transform headTransform;
@@ -14,12 +15,15 @@ public class Health : MonoBehaviour
 
     private float _defaultGravity;
 
+    public int MaxHealth => startHealth;
+
+    public int CurrentHealth => Mathf.Max(0, MaxHealth - _bulletsTaken);
+
     private void Start()
     {
         _defaultGravity = playerRigidbody.gravityScale;
     }
 
-    private int _bulletsTaken;
 
     public void OnHeadWasHit(Bullet bullet)
     {
@@ -37,7 +41,6 @@ public class Health : MonoBehaviour
 
     private void UpdateGravity()
     {
-        var decrement = _defaultGravity / (startHealth - 1);
-        playerRigidbody.gravityScale -= decrement;
+        playerRigidbody.gravityScale = _defaultGravity * (CurrentHealth / (float)MaxHealth);
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
 {
-    
     private Player2InputActions inputActions;
 
     [SerializeField] private float walkSpeed;
@@ -55,7 +54,6 @@ public class Movement : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext input)
     {
-        Debug.Log("OnJump");
         _canWalk = false;
         _isJump = true;
     }

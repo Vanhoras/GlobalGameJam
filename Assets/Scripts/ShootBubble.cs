@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class ShootBubble : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class ShootBubble : MonoBehaviour
 
     [SerializeField]
     private GameObject _bullet;
+
+    [SerializeField]
+    private PlayerMetadata _player;
 
     private void Start()
     {
@@ -20,16 +24,19 @@ public class ShootBubble : MonoBehaviour
         inputActions.Player.Shoot.performed -= OnShoot;
     }
 
-    private void OnShoot(InputAction.CallbackContext input) {
-
+    private void OnShoot(InputAction.CallbackContext input)
+    {
         Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);
-        Vector2 shootDirection = mousePosition - (Vector2) transform.position;
+        Vector2 shootDirection = mousePosition - (Vector2)transform.position;
 
-        Debug.Log(shootDirection);
-
-         var bullet = Instantiate(_bullet, transform.position, Quaternion.identity, null);
-            bullet.transform.right = shootDirection;
+        var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
+        var defaultScale = instance.transform.localScale;
+        var bullet = instance.GetComponent<Bullet>();
+        
+        bullet.transform.right = shootDirection;
+        bullet.transform.localScale = defaultScale + defaultScale * 0.5f * (_player.Health.MaxHealth / Mathf.Max(1,((float)_player.Health.CurrentHealth)));
+        bullet.Origin = _player.Player;
     }
 
 }
