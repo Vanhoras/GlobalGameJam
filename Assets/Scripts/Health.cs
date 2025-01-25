@@ -24,14 +24,11 @@ public class Health : MonoBehaviour
         _defaultGravity = playerRigidbody.gravityScale;
     }
 
-
-    public void OnHeadWasHit(Bullet bullet)
+    public void OnBulletHit()
     {
         _bulletsTaken++;
         UpdateHeadSize();
         UpdateGravity();
-
-        Destroy(bullet.gameObject);
     }
 
     private void UpdateHeadSize()

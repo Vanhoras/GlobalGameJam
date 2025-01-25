@@ -57,7 +57,7 @@ public class ShootBubble : MonoBehaviour
             Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             shootDirection = inputVector - (Vector2)transform.position;
         }
-
+        
         var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;
         var bullet = instance.GetComponent<Bullet>();

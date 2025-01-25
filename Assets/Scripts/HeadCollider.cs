@@ -8,21 +8,16 @@ public class HeadCollider : MonoBehaviour
     [SerializeField]
     private PlayerMetadata _player;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public Player Player => _player.Player;
+
+    public void OnBulletHit(Bullet bullet)
     {
-        if (collision.gameObject.tag != "Bullet")
-        {
-            return;
-        }
-
-        var bullet = collision.GetComponent<Bullet>();
-
         // Player should not be able to hit theirselves
-        if(bullet.Origin == _player.Player)
+        if (bullet.Origin == _player.Player)
         {
             return;
         }
 
-        _health.OnHeadWasHit(bullet);
+        _health.OnBulletHit();
     }
 }
