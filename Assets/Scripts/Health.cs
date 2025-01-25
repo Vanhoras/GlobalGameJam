@@ -43,12 +43,7 @@ public class Health : MonoBehaviour
         {
             playerRigidbody.gravityScale = -1;
 
-            Collider2D[] colliders = GetComponentsInChildren<Collider2D>();
-
-            foreach (var collider in colliders)
-            {
-                collider.enabled = false;
-            }
+            playerRigidbody.excludeLayers = ~(1 << 10);
         }
     }
 }
