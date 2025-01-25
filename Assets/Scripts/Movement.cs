@@ -161,4 +161,10 @@ public class Movement : MonoBehaviour
     {
         Gizmos.DrawLine(transform.position, groundCast.position);
     }
+
+    public void Knockback(float force)
+    {
+        Debug.Log("Knockback " + force);
+        _playerRigidbody.AddForce(new Vector2(-force, 0));
+    }
 }
