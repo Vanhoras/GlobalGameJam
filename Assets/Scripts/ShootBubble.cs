@@ -59,10 +59,6 @@ public class ShootBubble : MonoBehaviour
             shootDirection = inputVector - (Vector2)transform.position;
         }
         
-        
-
-        Debug.Log(_player.Player + " " + shootDirection);
-
         var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;
         var bullet = instance.GetComponent<Bullet>();
