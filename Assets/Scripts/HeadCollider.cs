@@ -21,7 +21,9 @@ public class HeadCollider : MonoBehaviour
             return;
         }
 
-        movement.Knockback(bullet.knockbackForce);
+        int bulletDirection = bullet.transform.position.x >= transform.position.x ? -1 : 1;
+
+        movement.Knockback(bullet.knockbackForce, bulletDirection);
 
         _health.OnBulletHit();
     }

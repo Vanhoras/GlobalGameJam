@@ -8,8 +8,11 @@ public class Movement : MonoBehaviour
     private Player1InputActions inputActions1;
     private Player2InputActions inputActions2;
 
-    [SerializeField] private float walkSpeed;
+    [SerializeField] private float walkForce;
+    [SerializeField] private float maxWalkSpeed;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float drag;
+    [SerializeField] private float snapForce;
     [SerializeField] private Transform groundCast;
 
     private PlayerMetadata _player;
@@ -139,16 +142,27 @@ public class Movement : MonoBehaviour
 
         if (inputVector.x != 0)
         {
-            _playerRigidbody.velocity = new Vector2(inputVector.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
 
             if (_canWalk)
             {
                 // TODO: Play Walk Animation
             }
-        }
-        else
+        } else
         {
-            _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
+            if (Mathf.Abs(_playerRigidbody.velocity.x) <= snapForce)
+            {
+                _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
+            } else {
+                float dragForce = -1 * drag * _playerRigidbody.velocity.x * _playerRigidbody.velocity.magnitude;
+                _playerRigidbody.AddForce(new Vector2(dragForce, 0));
+            }
+        }
+
+        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
+        {
+            int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
+            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
         }
     }
 
@@ -162,9 +176,9 @@ public class Movement : MonoBehaviour
         Gizmos.DrawLine(transform.position, groundCast.position);
     }
 
-    public void Knockback(float force)
+    public void Knockback(float force, int direction)
     {
         Debug.Log("Knockback " + force);
-        _playerRigidbody.AddForce(new Vector2(-force, 0));
+        _playerRigidbody.AddForce(new Vector2(direction * force, 0));
     }
 }
