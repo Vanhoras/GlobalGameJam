@@ -74,9 +74,6 @@ public class GameStateManager : MonoBehaviour
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
         nextScene = nextScene > arenas[arenas.Length - 1] ? arenas[0] : nextScene;
 
-        Debug.Log(nextScene);
-        Debug.Log(SceneManager.sceneCount);
-
         SceneManager.LoadScene(nextScene);
     }
 

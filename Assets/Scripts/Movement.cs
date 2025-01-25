@@ -25,7 +25,7 @@ public class Movement : MonoBehaviour
     private bool _isWalk;
     private bool _isJump;
 
-    private bool _isMirrored;
+    private DirectionE _currentDirection;
     
     private float _gunRotation;
     private float _startScale;
@@ -88,7 +88,7 @@ public class Movement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Mirror();
+        DetermineDirection();
         Move();
 
         if (_isJump)
@@ -99,8 +99,10 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void Mirror()
+    private void DetermineDirection()
     {
+        DirectionE direction;
+
         Vector2 inputVector;
         if (_player.Player == Player.Player1)
         {
@@ -110,19 +112,30 @@ public class Movement : MonoBehaviour
         else
         {
             Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
-            inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
-            inputVector.Normalize();
+            Vector2 worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            inputVector = worldMousePosition - (Vector2)transform.position;
         }
 
-        if (inputVector.x > transform.position.x + 0.2f)
-            _isMirrored = false;
-        if (inputVector.x < transform.position.x - 0.2f)
-            _isMirrored = true;
+        if (inputVector.x > 0)
+        {
+            direction = DirectionE.Right;
+        }
+        else if (inputVector.x < 0)
+        {
+            direction = DirectionE.Left;
+        }
+        else
+        {
+            direction = _currentDirection;
+        }
 
+        LookAtDirection(direction);
     }
 
     private void LookAtDirection(DirectionE direction)
     {
+        _currentDirection = direction;
+
         if (direction == DirectionE.Left)
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
@@ -172,11 +185,6 @@ public class Movement : MonoBehaviour
             int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
             _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed * healthSlowdown, _playerRigidbody.velocity.y);
         }
-    }
-
-    public bool IsMirror()
-    {
-        return _isMirrored;
     }
 
     void OnDrawGizmos()
