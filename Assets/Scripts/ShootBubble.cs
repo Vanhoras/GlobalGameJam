@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ShootBubble : MonoBehaviour
 {
@@ -8,9 +7,16 @@ public class ShootBubble : MonoBehaviour
     private GameObject _bullet;
     void Update()
     {
+        var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var shootDirection = mousePosition - transform.position;
+        shootDirection = new Vector2(shootDirection.x, shootDirection.y);
+
+        Debug.Log(shootDirection);
+        
         if (Input.GetButtonDown("Fire1"))
         {
-            Instantiate(_bullet, transform.position, transform.rotation, null);
+            var bullet = Instantiate(_bullet, transform.position, Quaternion.identity, null);
+            bullet.transform.right = shootDirection;
         }
     }
 }

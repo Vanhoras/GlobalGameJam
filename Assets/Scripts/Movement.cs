@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Player : MonoBehaviour {
+public class Movement : MonoBehaviour
+{
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
-    [SerializeField] private Transform gun;
     [SerializeField] private Transform groundCast;
-    [SerializeField] private Camera playerCamera;
+    [SerializeField] private Camera mainCamera;
 
     private bool _canJump;
     private bool _canWalk;
@@ -22,11 +22,11 @@ public class Player : MonoBehaviour {
     private Vector2 _inputAxis;
     private RaycastHit2D _hit;
 
-	void Start ()
+    void Start()
     {
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
-	}
+    }
 
     void Update()
     {
@@ -38,7 +38,10 @@ public class Player : MonoBehaviour {
                 _canWalk = true;
             }
         }
-        else _canJump = false;
+        else
+        {
+            _canJump = false;
+        };
 
         _inputAxis = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
@@ -51,25 +54,18 @@ public class Player : MonoBehaviour {
 
     void FixedUpdate()
     {
-        Vector3 dir = playerCamera.ScreenToWorldPoint(Input.mousePosition) - gun.transform.position;
-        dir.Normalize();
-
-        if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
+        if (mainCamera.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
             _isMirrored = false;
-        if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x - 0.2f)
+        if (mainCamera.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x - 0.2f)
             _isMirrored = true;
 
         if (!_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(_startScale, _startScale, 1);
-            gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
         if (_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(-dir.y, -dir.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(-_startScale, _startScale, 1);
-            gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
 
         if (_inputAxis.x != 0)

@@ -8,6 +8,6 @@ public class BubbleBullet : MonoBehaviour
     float speed = 20;
     void Update()
     {
-        transform.Translate(transform.forward * speed * Time.deltaTime);
+        transform.position += transform.right * speed * Time.deltaTime;
     }
 }
