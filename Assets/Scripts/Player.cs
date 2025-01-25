@@ -2,28 +2,35 @@
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
-    public float WalkSpeed;
-    public float JumpForce;
-    public Transform _Blade, _GroundCast;
-    public Camera cam;
-    public bool mirror;
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private Transform gun;
+    [SerializeField] private Transform groundCast;
+    [SerializeField] private Camera playerCamera;
 
-    private bool _canJump, _canWalk;
-    private bool _isWalk, _isJump;
-    private float rot, _startScale;
-    private Rigidbody2D rig;
+    private bool _canJump;
+    private bool _canWalk;
+
+    private bool _isWalk;
+    private bool _isJump;
+
+    private bool _isMirrored;
+
+    private float _gunRotation;
+    private float _startScale;
+    private Rigidbody2D _playerRigidbody;
     private Vector2 _inputAxis;
     private RaycastHit2D _hit;
 
 	void Start ()
     {
-        rig = gameObject.GetComponent<Rigidbody2D>();
+        _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
 	}
 
     void Update()
     {
-        if (_hit = Physics2D.Linecast(new Vector2(_GroundCast.position.x, _GroundCast.position.y + 0.2f), _GroundCast.position))
+        if (_hit = Physics2D.Linecast(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), groundCast.position))
         {
             if (!_hit.transform.CompareTag("Player"))
             {
@@ -44,45 +51,44 @@ public class Player : MonoBehaviour {
 
     void FixedUpdate()
     {
-        Vector3 dir = cam.ScreenToWorldPoint(Input.mousePosition) - _Blade.transform.position;
+        Vector3 dir = playerCamera.ScreenToWorldPoint(Input.mousePosition) - gun.transform.position;
         dir.Normalize();
 
-        if (cam.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
-            mirror = false;
-        if (cam.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x - 0.2f)
-            mirror = true;
+        if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x + 0.2f)
+            _isMirrored = false;
+        if (playerCamera.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x - 0.2f)
+            _isMirrored = true;
 
-        if (!mirror)
+        if (!_isMirrored)
         {
-            rot = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(_startScale, _startScale, 1);
-            _Blade.transform.rotation = Quaternion.AngleAxis(rot, Vector3.forward);
+            gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
-        if (mirror)
+        if (_isMirrored)
         {
-            rot = Mathf.Atan2(-dir.y, -dir.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(-dir.y, -dir.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(-_startScale, _startScale, 1);
-            _Blade.transform.rotation = Quaternion.AngleAxis(rot, Vector3.forward);
+            gun.transform.rotation = Quaternion.AngleAxis(_gunRotation, Vector3.forward);
         }
 
         if (_inputAxis.x != 0)
         {
-            rig.velocity = new Vector2(_inputAxis.x * WalkSpeed * Time.deltaTime, rig.velocity.y);
+            _playerRigidbody.velocity = new Vector2(_inputAxis.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);
 
             if (_canWalk)
             {
                 // TODO: Play Walk Animation
             }
         }
-
         else
         {
-            rig.velocity = new Vector2(0, rig.velocity.y);
+            _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
         }
 
         if (_isJump)
         {
-            rig.AddForce(new Vector2(0, JumpForce));
+            _playerRigidbody.AddForce(new Vector2(0, jumpForce));
             // TODO: Play Jump Animation
             _canJump = false;
             _isJump = false;
@@ -91,11 +97,11 @@ public class Player : MonoBehaviour {
 
     public bool IsMirror()
     {
-        return mirror;
+        return _isMirrored;
     }
 
     void OnDrawGizmos()
     {
-        Gizmos.DrawLine(transform.position, _GroundCast.position);
+        Gizmos.DrawLine(transform.position, groundCast.position);
     }
 }
