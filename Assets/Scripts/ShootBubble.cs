@@ -44,19 +44,24 @@ public class ShootBubble : MonoBehaviour
 
     private void OnShoot(InputAction.CallbackContext input)
     {
-        Vector2 inputVector;
+        Vector2 shootDirection;
 
         if (_player.Player == Player.Player1)
         {
-            inputVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            Debug.Log(gampadVector);
+            shootDirection = new Vector2(gampadVector.x, gampadVector.y);
         }
         else
         {
             Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
-            inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
+            shootDirection = inputVector - (Vector2)transform.position;
         }
         
-        Vector2 shootDirection = inputVector - (Vector2)transform.position;
+        
+
+        Debug.Log(_player.Player + " " + shootDirection);
 
         var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;

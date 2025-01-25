@@ -96,17 +96,15 @@ public class Movement : MonoBehaviour
         Vector2 inputVector;
         if (_player.Player == Player.Player1)
         {
-            inputVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            inputVector = new Vector2(gampadVector.x, gampadVector.y);
         }
         else
         {
             Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
             inputVector = mainCamera.ScreenToWorldPoint(mousePosition);
+            inputVector.Normalize();
         }
-
-
-
-        inputVector.Normalize();
 
         if (inputVector.x > transform.position.x + 0.2f)
             _isMirrored = false;
