@@ -21,11 +21,11 @@ public class Movement : MonoBehaviour
     private bool _isJump;
 
     private bool _isMirrored;
-
+    
     private float _gunRotation;
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
-    private RaycastHit2D _hit;
+    private RaycastHit2D[] _hit;
 
     void Start()
     {
@@ -48,19 +48,7 @@ public class Movement : MonoBehaviour
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
        
-    }
-
-    void Update()
-    {
-        if (_hit = Physics2D.Linecast(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), groundCast.position))
-        {
-            if (!_hit.transform.CompareTag("Player"))
-            {
-                _canJump = true;
-                _canWalk = true;
-            }
-        }
-        else _canJump = false;
+        _canJump = true;
     }
 
     private void OnDestroy()
@@ -71,6 +59,22 @@ public class Movement : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext input)
     {
+
+        _hit = Physics2D.LinecastAll(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), new Vector2(groundCast.position.x, groundCast.position.y - 0.2f));
+
+        foreach (RaycastHit2D hit in _hit)
+        {
+            if (hit.transform.tag == "Ground")
+            {
+                _canJump = true;
+
+                break;
+            }
+        }
+
+        if (!_canJump) return;
+
+        _canJump = false;
         _canWalk = false;
         _isJump = true;
     }
@@ -85,7 +89,6 @@ public class Movement : MonoBehaviour
         {
             _playerRigidbody.AddForce(new Vector2(0, jumpForce));
             // TODO: Play Jump Animation
-            _canJump = false;
             _isJump = false;
         }
     }

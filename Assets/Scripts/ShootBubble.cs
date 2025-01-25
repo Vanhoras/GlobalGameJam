@@ -49,7 +49,6 @@ public class ShootBubble : MonoBehaviour
         if (_player.Player == Player.Player1)
         {
             Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
-            Debug.Log(gampadVector);
             shootDirection = new Vector2(gampadVector.x, gampadVector.y);
         }
         else
@@ -58,10 +57,6 @@ public class ShootBubble : MonoBehaviour
             Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             shootDirection = inputVector - (Vector2)transform.position;
         }
-        
-        
-
-        Debug.Log(_player.Player + " " + shootDirection);
 
         var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;
