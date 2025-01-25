@@ -11,7 +11,6 @@ public class Movement : MonoBehaviour
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Transform groundCast;
-    [SerializeField] private Camera mainCamera;
 
     private PlayerMetadata _player;
 
@@ -101,7 +100,7 @@ public class Movement : MonoBehaviour
         else
         {
             Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
-            inputVector = mainCamera.ScreenToWorldPoint(mousePosition);
+            inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
         }
 
 
