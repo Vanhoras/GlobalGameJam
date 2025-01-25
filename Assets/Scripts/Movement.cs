@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
@@ -14,6 +15,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private float drag;
     [SerializeField] private float snapForce;
     [SerializeField] private Transform groundCast;
+    [SerializeField] private DirectionE initialDirection;
 
     private PlayerMetadata _player;
 
@@ -51,6 +53,8 @@ public class Movement : MonoBehaviour
         _startScale = transform.localScale.x;
        
         _canJump = true;
+
+        LookAtDirection(initialDirection);
     }
 
     private void OnDestroy()
@@ -115,15 +119,17 @@ public class Movement : MonoBehaviour
         if (inputVector.x < transform.position.x - 0.2f)
             _isMirrored = true;
 
-        if (!_isMirrored)
+    }
+
+    private void LookAtDirection(DirectionE direction)
+    {
+        if (direction == DirectionE.Left)
         {
-            _gunRotation = Mathf.Atan2(inputVector.y, inputVector.x) * Mathf.Rad2Deg;
-            transform.localScale = new Vector3(_startScale, _startScale, 1);
+            transform.eulerAngles = new Vector3(0, 0, 0);
         }
-        if (_isMirrored)
+        else if (direction == DirectionE.Right)
         {
-            _gunRotation = Mathf.Atan2(-inputVector.y, -inputVector.x) * Mathf.Rad2Deg;
-            transform.localScale = new Vector3(-_startScale, _startScale, 1);
+            transform.eulerAngles = new Vector3(0, 180, 0);
         }
     }
 
