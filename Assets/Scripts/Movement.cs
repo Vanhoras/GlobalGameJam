@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
 {
-    private Player2InputActions inputActions;
+    private Player1InputActions inputActions1;
+    private Player2InputActions inputActions2;
 
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private Transform groundCast;
     [SerializeField] private Camera mainCamera;
+
+    private PlayerMetadata _player;
 
     private bool _canJump;
     private bool _canWalk;
@@ -26,12 +30,25 @@ public class Movement : MonoBehaviour
 
     void Start()
     {
-        inputActions = new Player2InputActions();
-        inputActions.Player.Enable();
+        _player = GetComponent<PlayerMetadata>();
+
+        inputActions1 = new Player1InputActions();
+        inputActions2 = new Player2InputActions();
+
+        if (_player.Player == Player.Player1)
+        {
+            inputActions1.Player.Enable();
+            inputActions1.Player.Jump.performed += OnJump;
+        }
+        else
+        {
+            inputActions2.Player.Enable();
+            inputActions2.Player.Jump.performed += OnJump;
+        }
 
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
-        inputActions.Player.Jump.performed += OnJump;
+       
     }
 
     void Update()
@@ -49,7 +66,8 @@ public class Movement : MonoBehaviour
 
     private void OnDestroy()
     {
-        inputActions.Player.Shoot.performed -= OnJump;
+        inputActions1.Player.Shoot.performed -= OnJump;
+        inputActions2.Player.Shoot.performed -= OnJump;
     }
 
     private void OnJump(InputAction.CallbackContext input)
@@ -62,9 +80,7 @@ public class Movement : MonoBehaviour
     {
         Mirror();
 
-        Vector2 inputVector = inputActions.Player.Move.ReadValue<Vector2>();
-
-        Move(inputVector);
+        Move();
 
         if (_isJump)
         {
@@ -77,31 +93,51 @@ public class Movement : MonoBehaviour
 
     private void Mirror()
     {
-        Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
-        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(inputVector);
+        Vector2 inputVector;
+        if (_player.Player == Player.Player1)
+        {
+            inputVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+        }
+        else
+        {
+            Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
+            inputVector = mainCamera.ScreenToWorldPoint(mousePosition);
+        }
 
-        mousePosition.Normalize();
 
-        if (mousePosition.x > transform.position.x + 0.2f)
+
+        inputVector.Normalize();
+
+        if (inputVector.x > transform.position.x + 0.2f)
             _isMirrored = false;
-        if (mousePosition.x < transform.position.x - 0.2f)
+        if (inputVector.x < transform.position.x - 0.2f)
             _isMirrored = true;
 
         if (!_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(inputVector.y, inputVector.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(_startScale, _startScale, 1);
         }
         if (_isMirrored)
         {
-            _gunRotation = Mathf.Atan2(-mousePosition.y, -mousePosition.x) * Mathf.Rad2Deg;
+            _gunRotation = Mathf.Atan2(-inputVector.y, -inputVector.x) * Mathf.Rad2Deg;
             transform.localScale = new Vector3(-_startScale, _startScale, 1);
         }
     }
 
 
-    private void Move(Vector2 inputVector)
+    private void Move()
     {
+        Vector2 inputVector;
+        if (_player.Player == Player.Player1)
+        {
+            inputVector = inputActions1.Player.Move.ReadValue<Vector2>();
+        }
+        else
+        {
+            inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
+        }
+
         if (inputVector.x != 0)
         {
             _playerRigidbody.velocity = new Vector2(inputVector.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);

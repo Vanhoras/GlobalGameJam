@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class ShootBubble : MonoBehaviour
 {
-    private Player2InputActions inputActions;
+    private Player1InputActions inputActions1;
+    private Player2InputActions inputActions2;
 
     [SerializeField]
     private GameObject _bullet;
@@ -14,21 +14,49 @@ public class ShootBubble : MonoBehaviour
 
     private void Start()
     {
-        inputActions = new Player2InputActions();
-        inputActions.Player.Enable();
-        inputActions.Player.Shoot.performed += OnShoot;
+        inputActions1 = new Player1InputActions();
+        inputActions2 = new Player2InputActions();
+
+        if (_player.Player == Player.Player1)
+        {
+            inputActions1.Player.Enable();
+            inputActions1.Player.Shoot.performed += OnShoot;
+        } else
+        {
+            inputActions2.Player.Enable();
+            inputActions2.Player.Shoot.performed += OnShoot;
+        }
+        
     }
 
     private void OnDestroy()
     {
-        inputActions.Player.Shoot.performed -= OnShoot;
+        if (_player.Player == Player.Player1)
+        {
+            inputActions1.Player.Shoot.performed -= OnShoot;
+        }
+        else
+        {
+            inputActions2.Player.Shoot.performed -= OnShoot;
+        }
+        
     }
 
     private void OnShoot(InputAction.CallbackContext input)
     {
-        Vector2 inputVector = inputActions.Player.Aim.ReadValue<Vector2>();
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);
-        Vector2 shootDirection = mousePosition - (Vector2)transform.position;
+        Vector2 inputVector;
+
+        if (_player.Player == Player.Player1)
+        {
+            inputVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+        }
+        else
+        {
+            Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
+            inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
+        }
+        
+        Vector2 shootDirection = inputVector - (Vector2)transform.position;
 
         var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;
