@@ -14,13 +14,14 @@ public class ShootBubble : MonoBehaviour
 
     private void Start()
     {
-        playerInput = GetComponent<PlayerInput>();
-        playerInput.currentActionMap.Enable();
+        playerInput = GetComponentInParent<PlayerInput>();
 
         aimAction = playerInput.actions["Aim"];
     }
 
-    public void OnShoot() {
+    public void OnShoot(InputAction.CallbackContext context) {
+
+        Debug.Log("OnShoot");
 
         Vector2 inputVector = aimAction.ReadValue<Vector2>();
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(inputVector);

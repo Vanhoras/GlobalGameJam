@@ -51,7 +51,7 @@ public class Movement : MonoBehaviour
         else _canJump = false;
     }
 
-    public void OnJump()
+    public void OnJump(InputAction.CallbackContext context)
     {
         Debug.Log("OnJump");
 
