@@ -1,18 +1,12 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
     public float WalkSpeed;
     public float JumpForce;
-    public AnimationClip _walk, _jump;
-    public Animation _Legs;
     public Transform _Blade, _GroundCast;
     public Camera cam;
     public bool mirror;
-
 
     private bool _canJump, _canWalk;
     private bool _isWalk, _isJump;
@@ -77,8 +71,7 @@ public class Player : MonoBehaviour {
 
             if (_canWalk)
             {
-                _Legs.clip = _walk;
-                _Legs.Play();
+                // TODO: Play Walk Animation
             }
         }
 
@@ -90,8 +83,7 @@ public class Player : MonoBehaviour {
         if (_isJump)
         {
             rig.AddForce(new Vector2(0, JumpForce));
-            _Legs.clip = _jump;
-            _Legs.Play();
+            // TODO: Play Jump Animation
             _canJump = false;
             _isJump = false;
         }
