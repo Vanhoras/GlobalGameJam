@@ -29,12 +29,12 @@ public class GameStateManager : MonoBehaviour
         if (player == Player.Player1)
         {
             this.winningPlayer = Player.Player2;
-            SoundController.Instance.PlaySound(SfxIdentifier.Player2Win);
+            SoundController.Instance.PlaySound(SfxIdentifier.Player2Wins);
         }
         else
         {
             this.winningPlayer = Player.Player1;
-            SoundController.Instance.PlaySound(SfxIdentifier.Player1Win);
+            SoundController.Instance.PlaySound(SfxIdentifier.Player1Wins);
         }
 
         gameOver = true;
