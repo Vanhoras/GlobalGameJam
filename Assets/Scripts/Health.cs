@@ -39,5 +39,9 @@ public class Health : MonoBehaviour
     private void UpdateGravity()
     {
         playerRigidbody.gravityScale = _defaultGravity * (CurrentHealth / (float)MaxHealth);
+        if (playerRigidbody.gravityScale <= 0)
+        {
+            playerRigidbody.gravityScale = -1;
+        }
     }
 }
