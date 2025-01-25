@@ -101,7 +101,7 @@ public class Movement : MonoBehaviour
         else
         {
             Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
-            inputVector = mainCamera.ScreenToWorldPoint(mousePosition);
+            inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             inputVector.Normalize();
         }
 
