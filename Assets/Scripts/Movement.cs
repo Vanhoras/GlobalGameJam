@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class Movement : MonoBehaviour
 {
     
-    private Player1InputActions inputActions;
+    private Player2InputActions inputActions;
 
     [SerializeField] private float walkSpeed;
     [SerializeField] private float jumpForce;
@@ -27,7 +27,7 @@ public class Movement : MonoBehaviour
 
     void Start()
     {
-        inputActions = new Player1InputActions();
+        inputActions = new Player2InputActions();
         inputActions.Player.Enable();
 
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
