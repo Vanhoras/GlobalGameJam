@@ -3,16 +3,15 @@
 public class PlayerAnimationManager : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-    private static readonly int s_isMoving = Animator.StringToHash("IsMoving");
 
     public float PlayerSpeed { get; set; }
     public Vector2 FacingDirection { get; set; }
-    public bool IsFacingLeft { get; set; }
-
-    private bool m_isFacingLeft = false;
+    public bool IsFacingLeft { get; set; } 
+    private static readonly int s_isMoving = Animator.StringToHash("IsMoving");
     private static readonly int s_facingDirection = Animator.StringToHash("FacingDirection");
     private static readonly int s_moveSpeed = Animator.StringToHash("MoveSpeed");
     private static readonly int s_shoot = Animator.StringToHash("Shoot");
+    private static readonly int s_moveDirection = Animator.StringToHash("MoveDirection");
 
     public void TriggerShootAnimation()
     {
@@ -26,72 +25,73 @@ public class PlayerAnimationManager : MonoBehaviour
 
     private void Update()
     {
-        if (Mathf.Abs(PlayerSpeed) < 0.1f)
+        UpdateDirection();
+        _animator.SetFloat(s_facingDirection, CalculateAnimatorDirectionParameter(FacingDirection, IsFacingLeft));
+        _animator.SetFloat(s_moveSpeed, Mathf.Abs(PlayerSpeed));
+        var isMoving = Mathf.Abs(PlayerSpeed) >= 0.1f;
+        _animator.SetBool(s_isMoving, isMoving);
+        if (PlayerSpeed < 0)
         {
-            _animator.SetBool(s_isMoving, false);
+            _animator.SetFloat(s_moveDirection, -1);
         }
         else
         {
-            _animator.SetBool(s_isMoving, true);
+            _animator.SetFloat(s_moveDirection, 1);
         }
-
-        if (IsFacingLeft != m_isFacingLeft)
-        {
-            FlipVisuals();
-        }
-
-        m_isFacingLeft = IsFacingLeft;
-        _animator.SetFloat(s_facingDirection, CalculateAnimatorDirectionParameter(FacingDirection, IsFacingLeft));
-        _animator.SetFloat(s_moveSpeed, PlayerSpeed);
     }
 
-    private void FlipVisuals()
+    private void UpdateDirection()
     {
         var transform1 = transform;
         Vector3 scale = transform1.localScale;
-        scale.x *= -1;
+
+        if (IsFacingLeft)
+        {
+            scale.x = Mathf.Abs(scale.x);
+        }
+        else
+        {
+            scale.x = -Mathf.Abs(scale.x);
+        }
+
         transform1.localScale = scale;
     }
 
     private float CalculateAnimatorDirectionParameter(Vector2 direction, bool isFacingLeft)
     {
         //Calculate te coresponding angle of the direction vector
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        
+        //Depending on the angle:
         //If the player is facing left, angles between 90 and 270 are mapped to 1 to 0.
-        //If the player is facing right, angles between -90 and 90 are mapped to 1 to 0.
+        //If the player is facing right, angles between -90(270) and 90 are mapped to 0 to 1.
         
+        // Calculate the angle of the direction vector in degrees
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // Normalize the angle to a range of [0, 360)
+        angle = (angle + 360) % 360;
+
         if (isFacingLeft)
         {
-            if (angle < 0)
+            // Map angles between 90 and 270 to the range [1, 0]
+            if (angle >= 90 && angle <= 270)
             {
-                angle += 360;
-            }
-
-            if (angle > 90 && angle < 270)
-            {
-                return 1 - (angle - 90) / 180;
-            }
-            else
-            {
-                return 1 + angle / 180;
+                return Mathf.InverseLerp(270, 90, angle);
             }
         }
         else
         {
-            if (angle < 0)
+            // Map angles between -90 (or 270) and 90 to the range [0, 1]
+            if (angle <= 90 || angle >= 270)
             {
-                angle += 360;
-            }
-
-            if (angle > 90 && angle < 270)
-            {
-                return 1 + (angle - 90) / 180;
-            }
-            else
-            {
-                return 1 - angle / 180;
+                if (angle >= 270)
+                {
+                    angle -= 360; // Map 270-360 range to -90-0
+                }
+                return Mathf.InverseLerp(-90, 90, angle);
             }
         }
+
+        // Default to 0 for angles outside the mapped range
+        return 0f;
     }
 }
