@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -8,9 +7,6 @@ public class Movement : MonoBehaviour
     private PlayerInput playerInput;
     InputAction moveAction;
     InputAction aimAction;
-
-    private Player1InputActions inputActions1;
-    private Player2InputActions inputActions2;
 
     [SerializeField] private float walkForce;
     [SerializeField] private float maxWalkSpeed;
@@ -52,20 +48,6 @@ public class Movement : MonoBehaviour
 
         _player = GetComponent<PlayerMetadata>();
 
-        inputActions1 = new Player1InputActions();
-        inputActions2 = new Player2InputActions();
-
-        if (_player.Player == Player.Player1)
-        {
-            inputActions1.Player.Enable();
-            inputActions1.Player.Jump.performed += OnJump;
-        }
-        else
-        {
-            inputActions2.Player.Enable();
-            inputActions2.Player.Jump.performed += OnJump;
-        }
-
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
        
@@ -74,14 +56,15 @@ public class Movement : MonoBehaviour
         LookAtDirection(initialDirection);
     }
 
-    private void OnDestroy()
+    public void OnAim(InputAction.CallbackContext input)
     {
-        inputActions1.Player.Jump.performed -= OnJump;
-        inputActions2.Player.Jump.performed -= OnJump;
+        Debug.Log("OnAim 2");
     }
 
-    private void OnJump(InputAction.CallbackContext input)
+    public void OnJump(InputAction.CallbackContext input)
     {
+        Debug.Log("OnJump");
+
         _hit = Physics2D.LinecastAll(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), new Vector2(groundCast.position.x, groundCast.position.y - 0.2f));
 
         foreach (RaycastHit2D hit in _hit)
@@ -105,9 +88,6 @@ public class Movement : MonoBehaviour
 
     void FixedUpdate()
     {
-        DetermineDirection();
-        Move();
-
         if (_isJump)
         {
             _playerRigidbody.AddForce(new Vector2(0, jumpForce));
@@ -126,7 +106,7 @@ public class Movement : MonoBehaviour
         Vector2 inputVector;
         if (_player.Player == Player.Player1)
         {
-            Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            Vector3 gampadVector = Vector3.zero;
             inputVector = new Vector2(gampadVector.x, gampadVector.y);
 
             if (inputVector.x == 0 && inputVector.y == 0)
@@ -136,7 +116,7 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
+            Vector2 mousePosition = Vector2.zero;
             Vector2 worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
             inputVector = worldMousePosition - (Vector2)transform.position;
         }
@@ -169,16 +149,18 @@ public class Movement : MonoBehaviour
     }
 
 
-    private void Move()
+    public void OnMove(InputAction.CallbackContext input)
     {
+        Debug.Log("OnMove");
+
         Vector2 inputVector;
         if (_player.Player == Player.Player1)
         {
-            inputVector = inputActions1.Player.Move.ReadValue<Vector2>();
+            inputVector = Vector2.zero;
         }
         else
         {
-            inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
+            inputVector = Vector2.zero;
         }
 
 

@@ -23,18 +23,7 @@ public class ShootBubble : MonoBehaviour
 
     private void Start()
     {
-        inputActions1 = new Player1InputActions();
-        inputActions2 = new Player2InputActions();
-
-        if (_player.Player == Player.Player1)
-        {
-            inputActions1.Player.Enable();
-            inputActions1.Player.Shoot.performed += OnShoot;
-        } else
-        {
-            inputActions2.Player.Enable();
-            inputActions2.Player.Shoot.performed += OnShoot;
-        }
+        playerInput = GetComponent<PlayerInput>();
     }
 
     private void Update()
@@ -47,21 +36,16 @@ public class ShootBubble : MonoBehaviour
         crosshair.transform.right = GetShootDirection();
     }
 
-    private void OnDestroy()
+    public void OnAim(InputAction.CallbackContext input)
     {
-        if (_player.Player == Player.Player1)
-        {
-            inputActions1.Player.Shoot.performed -= OnShoot;
-        }
-        else
-        {
-            inputActions2.Player.Shoot.performed -= OnShoot;
-        }
-        
+        Debug.Log("OnAim");
+
     }
 
-    private void OnShoot(InputAction.CallbackContext input)
+    public void OnShoot(InputAction.CallbackContext input)
     {
+        Debug.Log("OnShoot");
+
         var shootDirection = GetShootDirection();
 
         GameObject bulletPrefab = _bulletPrefabs[Random.Range(0, _bulletPrefabs.Length - 1)];
@@ -91,7 +75,7 @@ public class ShootBubble : MonoBehaviour
 
         if (_player.Player == Player.Player1)
         {
-            Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            Vector3 gampadVector = Vector3.zero;
             shootDirection = new Vector2(gampadVector.x, gampadVector.y);
 
             if (shootDirection.x == 0 && shootDirection.y == 0)
@@ -101,7 +85,7 @@ public class ShootBubble : MonoBehaviour
         }
         else
         {
-            Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
+            Vector2 mousePosition = Vector2.zero;
             Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             shootDirection = inputVector - (Vector2)transform.position;
         }
