@@ -15,6 +15,9 @@ public class ShootBubble : MonoBehaviour
     [SerializeField] 
     private PlayerAnimationManager animationManager;
 
+    [SerializeField]
+    private Transform crosshair;
+
     private void Start()
     {
         inputActions1 = new Player1InputActions();
@@ -29,7 +32,16 @@ public class ShootBubble : MonoBehaviour
             inputActions2.Player.Enable();
             inputActions2.Player.Shoot.performed += OnShoot;
         }
-        
+    }
+
+    private void Update()
+    {
+        if(crosshair == null)
+        {
+            return;
+        }
+
+        crosshair.transform.right = GetShootDirection();
     }
 
     private void OnDestroy()
@@ -47,6 +59,26 @@ public class ShootBubble : MonoBehaviour
 
     private void OnShoot(InputAction.CallbackContext input)
     {
+        var shootDirection = GetShootDirection();
+
+        GameObject bulletPrefab = _bulletPrefabs[Random.Range(0, _bulletPrefabs.Length - 1)];
+        
+        var instance = Instantiate(bulletPrefab, transform.position, Quaternion.identity, null);
+        var defaultScale = instance.transform.localScale;
+        var bullet = instance.GetComponent<Bullet>();
+        
+        bullet.transform.right = shootDirection;
+        bullet.transform.localScale = defaultScale + defaultScale * 0.5f * (_player.Health.MaxHealth / Mathf.Max(1,((float)_player.Health.CurrentHealth)));
+        bullet.Origin = _player.Player;
+        bullet.Direction = shootDirection.x >= 0 ? 1 : -1;
+
+        SoundController.Instance.PlaySound(SfxIdentifier.Shoot);
+
+        animationManager.TriggerShootAnimation();
+    }
+
+    private Vector2 GetShootDirection()
+    {
         Vector2 shootDirection;
 
         if (_player.Player == Player.Player1)
@@ -61,21 +93,7 @@ public class ShootBubble : MonoBehaviour
             shootDirection = inputVector - (Vector2)transform.position;
         }
 
-        GameObject bulletPrefab = _bulletPrefabs[Random.Range(0, _bulletPrefabs.Length - 1)];
-        
-        
-        var instance = Instantiate(bulletPrefab, transform.position, Quaternion.identity, null);
-        var defaultScale = instance.transform.localScale;
-        var bullet = instance.GetComponent<Bullet>();
-        
-        bullet.transform.right = shootDirection;
-        bullet.transform.localScale = defaultScale + defaultScale * 0.5f * (_player.Health.MaxHealth / Mathf.Max(1,((float)_player.Health.CurrentHealth)));
-        bullet.Origin = _player.Player;
-        bullet.Direction = shootDirection.x >= 0 ? 1 : -1;
-
-        SoundController.Instance.PlaySound(SfxIdentifier.Shoot);
-
-        animationManager.TriggerShootAnimation();
+        return shootDirection;
     }
 
 }
