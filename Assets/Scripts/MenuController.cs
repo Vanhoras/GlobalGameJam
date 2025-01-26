@@ -26,8 +26,8 @@ public class MenuController : MonoBehaviour
             _player2.text = "[Ready]";
             SoundController.Instance.PlaySound(SfxIdentifier.UiConfirm);
         }
-
-        var gamepadButtonPressed = Gamepad.current.allControls.Any(x => x is ButtonControl button && x.IsPressed() && !x.synthetic);
+        
+        var gamepadButtonPressed = Gamepad.current != null && Gamepad.current.allControls.Any(x => x is ButtonControl button && x.IsPressed() && !x.synthetic);
 
         if (!_isPlayer1Ready && gamepadButtonPressed)
         {
