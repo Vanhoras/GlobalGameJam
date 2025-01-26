@@ -25,11 +25,8 @@ public class MusicBox : MonoBehaviour
         { 
             Instance = this; 
             DontDestroyOnLoad(this);
-        } 
-    }
+        }
 
-    private void Start()
-    {
         audioSource = GetComponent<AudioSource>();
         originalVolumeLevel = audioSource.volume;
     }
