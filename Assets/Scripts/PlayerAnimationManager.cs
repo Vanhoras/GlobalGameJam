@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.U2D.Animation;
 
 public class PlayerAnimationManager : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
+    //[SerializeField] private SpriteLibrary _spriteLibrary;
 
     public float PlayerSpeed { get; set; }
     public Vector2 FacingDirection { get; set; }
@@ -19,6 +22,41 @@ public class PlayerAnimationManager : MonoBehaviour
     public void TriggerShootAnimation()
     {
         _animator.SetTrigger(s_shoot);
+    }
+
+    private void Start()
+    {
+        /*//Find all sprite skin components in the children
+        var spriteSkins = GetComponentsInChildren<SpriteSkin>();
+        foreach (var spriteSkin in spriteSkins)
+        {
+            //user reflection to set "autoRebind" property on spriteSkin to false
+            var spriteSkinType = spriteSkin.GetType();
+            var autoRebindProperty = spriteSkinType.GetProperty("autoRebind");
+            if (autoRebindProperty != null)
+            {
+                autoRebindProperty.SetValue(spriteSkin, false);
+            }
+        }
+
+        yield return new WaitForSeconds(0.2f);
+        
+        foreach (var spriteSkin in spriteSkins)
+        {
+            //user reflection to set "autoRebind" property on spriteSkin to false
+            var spriteSkinType = spriteSkin.GetType();
+            var autoRebindProperty = spriteSkinType.GetProperty("autoRebind");
+            if (autoRebindProperty != null)
+            {
+                autoRebindProperty.SetValue(spriteSkin, true);
+            }
+        }*/
+
+        /*var currentSpriteLibrary = _spriteLibrary.spriteLibraryAsset;
+        _spriteLibrary.spriteLibraryAsset = null;
+        yield return new WaitForSeconds(0.2f);;
+        
+        _spriteLibrary.spriteLibraryAsset = currentSpriteLibrary;*/
     }
 
     private void Awake()
