@@ -116,11 +116,11 @@ public class Movement : MonoBehaviour
             inputVector = worldMousePosition - (Vector2)transform.position;
         }
 
-        if (inputVector.x > 0)
+        if (inputVector.x > 0.1)
         {
             direction = DirectionE.Right;
         }
-        else if (inputVector.x < 0)
+        else if (inputVector.x < -0.1)
         {
             direction = DirectionE.Left;
         }
