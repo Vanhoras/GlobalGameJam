@@ -18,6 +18,8 @@ public class ShootBubble : MonoBehaviour
     [SerializeField]
     private Transform crosshair;
 
+    Vector2 lastShootDirection = Vector2.zero;
+
     private void Start()
     {
         inputActions1 = new Player1InputActions();
@@ -88,6 +90,11 @@ public class ShootBubble : MonoBehaviour
         {
             Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
             shootDirection = new Vector2(gampadVector.x, gampadVector.y);
+
+            if (shootDirection.x == 0 && shootDirection.y == 0)
+            {
+                shootDirection = lastShootDirection;
+            }
         }
         else
         {
@@ -95,6 +102,8 @@ public class ShootBubble : MonoBehaviour
             Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             shootDirection = inputVector - (Vector2)transform.position;
         }
+
+        lastShootDirection = shootDirection;
 
         return shootDirection;
     }

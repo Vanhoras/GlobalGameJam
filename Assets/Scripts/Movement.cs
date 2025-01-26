@@ -12,7 +12,6 @@ public class Movement : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float drag;
     [SerializeField] private float snapForce;
-    [SerializeField] private float rotationForce;
     [SerializeField] private Transform groundCast;
     [SerializeField] private DirectionE initialDirection;
 
@@ -139,17 +138,6 @@ public class Movement : MonoBehaviour
     {
         _currentDirection = direction;
 
-        /*
-        if (direction == DirectionE.Left)
-        {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-        }
-        else if (direction == DirectionE.Right)
-        {
-            transform.eulerAngles = new Vector3(0, 180, 0);
-        }
-        */
-
         animationManager.IsFacingLeft = _currentDirection == DirectionE.Left;
     }
 
@@ -167,15 +155,21 @@ public class Movement : MonoBehaviour
         }
 
 
-
         if (inputVector.x != 0)
         {
-            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
+            bool velocityPositive = _playerRigidbody.velocity.x > 0;
+            bool velocityNegative = _playerRigidbody.velocity.x < 0;
 
-            if (_canWalk)
+            if ( velocityPositive && inputVector.x < 0)
             {
-                // TODO: Play Walk Animation
+                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 2), _playerRigidbody.velocity.y);
+            } else if (velocityNegative && inputVector.x > 0)
+            {
+                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -2), _playerRigidbody.velocity.y);
             }
+
+
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
         } else
         {
             if (Mathf.Abs(_playerRigidbody.velocity.x) <= snapForce)
