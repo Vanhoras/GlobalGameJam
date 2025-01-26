@@ -57,6 +57,11 @@ public class SoundController : MonoBehaviour
             {
                 Debug.Log("Playing " + key);
                 audioSource.PlayOneShot(entry.AudioClip);
+
+                if (key == SfxIdentifier.BubblePlayerHit && MusicBox.Instance != null)
+                {
+                    MusicBox.Instance.DuckVolume();
+                }
             }
 
             return;

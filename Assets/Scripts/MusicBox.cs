@@ -11,6 +11,9 @@ public class MusicBox : MonoBehaviour
 
     [SerializeField] private AudioClip menuMusic;
     [SerializeField] private AudioClip gameplayMusic;
+    
+    private float originalVolumeLevel;
+    private float duckVolumeLevelPercentage = 0.2f;
 
     private void Awake() 
     { 
@@ -28,6 +31,7 @@ public class MusicBox : MonoBehaviour
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        originalVolumeLevel = audioSource.volume;
     }
 
     public void SwitchToMenuMusic()
@@ -42,4 +46,14 @@ public class MusicBox : MonoBehaviour
         audioSource.Play();
     }
 
+    public void DuckVolume()
+    {
+        audioSource.volume = duckVolumeLevelPercentage * originalVolumeLevel;
+        Invoke(nameof(RestoreVolume), 0.8f);
+    }
+    
+    public void RestoreVolume()
+    {
+        audioSource.volume = originalVolumeLevel;
+    }
 }
