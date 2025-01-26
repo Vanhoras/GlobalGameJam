@@ -14,6 +14,8 @@ public class PlayerAnimationManager : MonoBehaviour
     private static readonly int s_shoot = Animator.StringToHash("Shoot");
     private static readonly int s_moveDirection = Animator.StringToHash("MoveDirection");
 
+    private float m_lastValidFacingDirectionParameterValue = 0.5f;
+
     public void TriggerShootAnimation()
     {
         _animator.SetTrigger(s_shoot);
@@ -67,7 +69,7 @@ public class PlayerAnimationManager : MonoBehaviour
         //If the player is facing left, angles between 90 and 270 are mapped to 1 to 0.
         //If the player is facing right, angles between -90(270) and 90 are mapped to 0 to 1.
 
-        float output = 0;
+        float output = -1;
         
         // Calculate the angle of the direction vector in degrees
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -99,6 +101,11 @@ public class PlayerAnimationManager : MonoBehaviour
                 output = (angle + 90f) / 180f; // Linearly interpolate from 0 (at -90) to 1 (at 90)
             }
         }
+        
+        if(output == -1)
+            output = m_lastValidFacingDirectionParameterValue;
+        else
+            m_lastValidFacingDirectionParameterValue = output;
         
         return output;
     }
