@@ -12,9 +12,11 @@ public class PlayerAnimationManager : MonoBehaviour
     private bool m_isFacingLeft = false;
     private static readonly int s_facingDirection = Animator.StringToHash("FacingDirection");
     private static readonly int s_moveSpeed = Animator.StringToHash("MoveSpeed");
+    private static readonly int s_shoot = Animator.StringToHash("Shoot");
 
     public void TriggerShootAnimation()
     {
+        _animator.SetTrigger(s_shoot);
     }
 
     private void Awake()
