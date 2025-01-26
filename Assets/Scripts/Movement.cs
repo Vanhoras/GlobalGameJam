@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -31,6 +32,9 @@ public class Movement : MonoBehaviour
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
     private RaycastHit2D[] _hit;
+
+    Vector2 lastFacedDirection = Vector2.zero;
+
     void Start()
     {
         _player = GetComponent<PlayerMetadata>();
@@ -108,6 +112,11 @@ public class Movement : MonoBehaviour
         {
             Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
             inputVector = new Vector2(gampadVector.x, gampadVector.y);
+
+            if (inputVector.x == 0 && inputVector.y == 0)
+            {
+                inputVector = lastFacedDirection;
+            }
         }
         else
         {
@@ -116,11 +125,11 @@ public class Movement : MonoBehaviour
             inputVector = worldMousePosition - (Vector2)transform.position;
         }
 
-        if (inputVector.x > 0.1)
+        if (inputVector.x > 0)
         {
             direction = DirectionE.Right;
         }
-        else if (inputVector.x < -0.1)
+        else if (inputVector.x < 0)
         {
             direction = DirectionE.Left;
         }
@@ -131,23 +140,14 @@ public class Movement : MonoBehaviour
 
         animationManager.FacingDirection = inputVector;
 
+        lastFacedDirection = inputVector;
+
         LookAtDirection(direction);
     }
 
     private void LookAtDirection(DirectionE direction)
     {
         _currentDirection = direction;
-
-        /*
-        if (direction == DirectionE.Left)
-        {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-        }
-        else if (direction == DirectionE.Right)
-        {
-            transform.eulerAngles = new Vector3(0, 180, 0);
-        }
-        */
 
         animationManager.IsFacingLeft = _currentDirection == DirectionE.Left;
     }
@@ -165,16 +165,22 @@ public class Movement : MonoBehaviour
             inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
         }
 
-        float healthSlowdown = Mathf.Lerp(0.6f, 1, (((float)_player.Health.CurrentHealth) / _player.Health.MaxHealth));
 
         if (inputVector.x != 0)
         {
-            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce * healthSlowdown, 0));
+            bool velocityPositive = _playerRigidbody.velocity.x > 0;
+            bool velocityNegative = _playerRigidbody.velocity.x < 0;
 
-            if (_canWalk)
+            if ( velocityPositive && inputVector.x < 0)
             {
-                // TODO: Play Walk Animation
+                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 2), _playerRigidbody.velocity.y);
+            } else if (velocityNegative && inputVector.x > 0)
+            {
+                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -2), _playerRigidbody.velocity.y);
             }
+
+
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
         } else
         {
             if (Mathf.Abs(_playerRigidbody.velocity.x) <= snapForce)
@@ -186,10 +192,10 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed * healthSlowdown)
+        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
         {
             int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
-            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed * healthSlowdown, _playerRigidbody.velocity.y);
+            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
         }
 
         animationManager.PlayerSpeed = _playerRigidbody.velocity.x;
