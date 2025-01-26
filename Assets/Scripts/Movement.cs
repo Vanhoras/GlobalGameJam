@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -31,6 +32,9 @@ public class Movement : MonoBehaviour
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
     private RaycastHit2D[] _hit;
+
+    Vector2 lastFacedDirection = Vector2.zero;
+
     void Start()
     {
         _player = GetComponent<PlayerMetadata>();
@@ -108,6 +112,11 @@ public class Movement : MonoBehaviour
         {
             Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
             inputVector = new Vector2(gampadVector.x, gampadVector.y);
+
+            if (inputVector.x == 0 && inputVector.y == 0)
+            {
+                inputVector = lastFacedDirection;
+            }
         }
         else
         {
@@ -130,6 +139,8 @@ public class Movement : MonoBehaviour
         }
 
         animationManager.FacingDirection = inputVector;
+
+        lastFacedDirection = inputVector;
 
         LookAtDirection(direction);
     }
