@@ -18,6 +18,14 @@ public class MenuController : MonoBehaviour
     private bool _isPlayer1Ready = false;
     private bool _isPlayer2Ready = false;
 
+    private void Start()
+    {
+        if (MusicBox.Instance != null)
+        {
+            MusicBox.Instance.SwitchToMenuMusic();
+        }
+    }
+
     void Update()
     {
         if(!_isPlayer2Ready && Input.anyKeyDown)
