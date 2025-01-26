@@ -11,11 +11,11 @@ public class PlayerWonText : MonoBehaviour
     {
         if (player == Player.Player1)
         {
-            tmp.text = "Player 1 Wins!";
+            tmp.text = "PLAYER 1";
         }
         else if (player == Player.Player2)
         {
-            tmp.text = "Player 2 Wins!";
+            tmp.text = "PLAYER 2";
         }
     }
 }
