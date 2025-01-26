@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -8,10 +9,20 @@ public class Movement : MonoBehaviour
     InputAction moveAction;
     InputAction aimAction;
 
-    [SerializeField] private float walkSpeed;
+    private Player1InputActions inputActions1;
+    private Player2InputActions inputActions2;
+
+    [SerializeField] private float walkForce;
+    [SerializeField] private float maxWalkSpeed;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float drag;
+    [SerializeField] private float snapForce;
     [SerializeField] private Transform groundCast;
-    [SerializeField] private Camera mainCamera;
+    [SerializeField] private DirectionE initialDirection;
+
+    [SerializeField] private PlayerAnimationManager animationManager;
+
+    private PlayerMetadata _player;
 
     private bool _canJump;
     private bool _canWalk;
@@ -19,12 +30,14 @@ public class Movement : MonoBehaviour
     private bool _isWalk;
     private bool _isJump;
 
-    private bool _isMirrored;
-
+    private DirectionE _currentDirection;
+    
     private float _gunRotation;
     private float _startScale;
     private Rigidbody2D _playerRigidbody;
-    private RaycastHit2D _hit;
+    private RaycastHit2D[] _hit;
+
+    Vector2 lastFacedDirection = Vector2.zero;
 
     void Start()
     {
@@ -36,97 +49,181 @@ public class Movement : MonoBehaviour
 
         _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
         _startScale = transform.localScale.x;
+
+        _player = GetComponent<PlayerMetadata>();
+
+        inputActions1 = new Player1InputActions();
+        inputActions2 = new Player2InputActions();
+
+        if (_player.Player == Player.Player1)
+        {
+            inputActions1.Player.Enable();
+            inputActions1.Player.Jump.performed += OnJump;
+        }
+        else
+        {
+            inputActions2.Player.Enable();
+            inputActions2.Player.Jump.performed += OnJump;
+        }
+
+        _playerRigidbody = gameObject.GetComponent<Rigidbody2D>();
+        _startScale = transform.localScale.x;
+       
+        _canJump = true;
+
+        LookAtDirection(initialDirection);
     }
 
-    void Update()
+    private void OnDestroy()
     {
-        if (_hit = Physics2D.Linecast(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), groundCast.position))
+        inputActions1.Player.Jump.performed -= OnJump;
+        inputActions2.Player.Jump.performed -= OnJump;
+    }
+
+    private void OnJump(InputAction.CallbackContext input)
+    {
+        _hit = Physics2D.LinecastAll(new Vector2(groundCast.position.x, groundCast.position.y + 0.2f), new Vector2(groundCast.position.x, groundCast.position.y - 0.2f));
+
+        foreach (RaycastHit2D hit in _hit)
         {
-            if (!_hit.transform.CompareTag("Player"))
+            if (hit.transform.tag == "Ground")
             {
                 _canJump = true;
-                _canWalk = true;
+
+                break;
             }
         }
-        else _canJump = false;
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        Debug.Log("OnJump");
 
         if (!_canJump) return;
 
+        _canJump = false;
         _canWalk = false;
         _isJump = true;
+
+        SoundController.Instance.PlaySound(SfxIdentifier.Jump);
     }
 
     void FixedUpdate()
     {
-        Mirror();
-
-        Vector2 inputVector = moveAction.ReadValue<Vector2>();
-
-        Move(inputVector);
+        DetermineDirection();
+        Move();
 
         if (_isJump)
         {
             _playerRigidbody.AddForce(new Vector2(0, jumpForce));
             // TODO: Play Jump Animation
-            _canJump = false;
             _isJump = false;
         }
     }
 
-    private void Mirror()
+    private void DetermineDirection()
     {
-        Vector2 inputVector = aimAction.ReadValue<Vector2>();
-        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(inputVector);
 
-        mousePosition.Normalize();
+        Vector2 inputVectorNew = aimAction.ReadValue<Vector2>();
 
-        if (mousePosition.x > transform.position.x + 0.2f)
-            _isMirrored = false;
-        if (mousePosition.x < transform.position.x - 0.2f)
-            _isMirrored = true;
+        DirectionE direction;
 
-        if (!_isMirrored)
+        Vector2 inputVector;
+        if (_player.Player == Player.Player1)
         {
-            _gunRotation = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
-            transform.localScale = new Vector3(_startScale, _startScale, 1);
-        }
-        if (_isMirrored)
-        {
-            _gunRotation = Mathf.Atan2(-mousePosition.y, -mousePosition.x) * Mathf.Rad2Deg;
-            transform.localScale = new Vector3(-_startScale, _startScale, 1);
-        }
-    }
+            Vector3 gampadVector = inputActions1.Player.Aim.ReadValue<Vector2>();
+            inputVector = new Vector2(gampadVector.x, gampadVector.y);
 
-
-    private void Move(Vector2 inputVector)
-    {
-        if (inputVector.x != 0)
-        {
-            _playerRigidbody.velocity = new Vector2(inputVector.x * walkSpeed * Time.deltaTime, _playerRigidbody.velocity.y);
-
-            if (_canWalk)
+            if (inputVector.x == 0 && inputVector.y == 0)
             {
-                // TODO: Play Walk Animation
+                inputVector = lastFacedDirection;
             }
         }
         else
         {
-            _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
+            Vector2 mousePosition = inputActions2.Player.Aim.ReadValue<Vector2>();
+            Vector2 worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            inputVector = worldMousePosition - (Vector2)transform.position;
         }
+
+        if (inputVector.x > 0)
+        {
+            direction = DirectionE.Right;
+        }
+        else if (inputVector.x < 0)
+        {
+            direction = DirectionE.Left;
+        }
+        else
+        {
+            direction = _currentDirection;
+        }
+
+        animationManager.FacingDirection = inputVector;
+
+        lastFacedDirection = inputVector;
+
+        LookAtDirection(direction);
     }
 
-    public bool IsMirror()
+    private void LookAtDirection(DirectionE direction)
     {
-        return _isMirrored;
+        _currentDirection = direction;
+
+        animationManager.IsFacingLeft = _currentDirection == DirectionE.Left;
+    }
+
+
+    private void Move()
+    {
+        Vector2 inputVector;
+        if (_player.Player == Player.Player1)
+        {
+            inputVector = inputActions1.Player.Move.ReadValue<Vector2>();
+        }
+        else
+        {
+            inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
+        }
+
+
+        if (inputVector.x != 0)
+        {
+            bool velocityPositive = _playerRigidbody.velocity.x > 0;
+            bool velocityNegative = _playerRigidbody.velocity.x < 0;
+
+            if ( velocityPositive && inputVector.x < 0)
+            {
+                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 2), _playerRigidbody.velocity.y);
+            } else if (velocityNegative && inputVector.x > 0)
+            {
+                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -2), _playerRigidbody.velocity.y);
+            }
+
+
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
+        } else
+        {
+            if (Mathf.Abs(_playerRigidbody.velocity.x) <= snapForce)
+            {
+                _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
+            } else {
+                float dragForce = -1 * drag * _playerRigidbody.velocity.x * _playerRigidbody.velocity.magnitude;
+                _playerRigidbody.AddForce(new Vector2(dragForce, 0));
+            }
+        }
+
+        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
+        {
+            int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
+            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
+        }
+
+        animationManager.PlayerSpeed = _playerRigidbody.velocity.x;
     }
 
     void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, groundCast.position);
+    }
+
+    public void Knockback(float force, int direction)
+    {
+        _playerRigidbody.AddForce(new Vector2(direction * force, 0));
     }
 }
