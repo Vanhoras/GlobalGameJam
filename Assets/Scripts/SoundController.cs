@@ -32,9 +32,6 @@ public class SoundController : MonoBehaviour
     [SerializeField]
     private AudioSource audioSource;
 
-    [SerializeField]
-    private bool logging;
-
     private static SoundController instance;
 
     public static SoundController Instance => instance;
@@ -54,15 +51,11 @@ public class SoundController : MonoBehaviour
                 return;
             }
 
-            if (logging)
-            {
-                Debug.Log("Playing " + key);
-                audioSource.PlayOneShot(entry.AudioClip);
+            audioSource.PlayOneShot(entry.AudioClip);
 
-                if (key == SfxIdentifier.BubblePlayerHit && MusicBox.Instance != null)
-                {
-                    MusicBox.Instance.DuckVolume();
-                }
+            if (key == SfxIdentifier.BubblePlayerHit && MusicBox.Instance != null)
+            {
+                MusicBox.Instance.DuckVolume();
             }
 
             return;
