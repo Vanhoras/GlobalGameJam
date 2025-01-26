@@ -7,7 +7,7 @@ public class ShootBubble : MonoBehaviour
     private Player2InputActions inputActions2;
 
     [SerializeField]
-    private GameObject _bullet;
+    private GameObject[] _bulletPrefabs;
 
     [SerializeField]
     private PlayerMetadata _player;
@@ -57,8 +57,11 @@ public class ShootBubble : MonoBehaviour
             Vector2 inputVector = Camera.main.ScreenToWorldPoint(mousePosition);
             shootDirection = inputVector - (Vector2)transform.position;
         }
+
+        GameObject bulletPrefab = _bulletPrefabs[Random.Range(0, _bulletPrefabs.Length - 1)];
         
-        var instance = Instantiate(_bullet, transform.position, Quaternion.identity, null);
+        
+        var instance = Instantiate(bulletPrefab, transform.position, Quaternion.identity, null);
         var defaultScale = instance.transform.localScale;
         var bullet = instance.GetComponent<Bullet>();
         
