@@ -68,7 +68,21 @@ public class ShootBubble : MonoBehaviour
         var bullet = instance.GetComponent<Bullet>();
         
         bullet.transform.right = shootDirection;
-        bullet.transform.localScale = defaultScale + defaultScale * 0.5f * (_player.Health.MaxHealth / Mathf.Max(1,((float)_player.Health.CurrentHealth)));
+
+        Debug.Log("scale before: " + bullet.transform.localScale);
+        Debug.Log("max: " + _player.Health.MaxHealth);
+        Debug.Log("current: " + _player.Health.CurrentHealth);
+        Debug.Log("current2: " + Mathf.Max(1, ((float)_player.Health.CurrentHealth)));
+        
+
+        float sizeHealthCoefficient = 1 + (_player.Health.MaxHealth - Mathf.Max(1, ((float)_player.Health.CurrentHealth))) / 2;
+
+        Debug.Log("health coefficient: " + sizeHealthCoefficient);
+
+        bullet.transform.localScale = defaultScale + defaultScale * 0.5f * sizeHealthCoefficient;
+        Debug.Log("scale after: " + bullet.transform.localScale);
+
+
         bullet.Origin = _player.Player;
         bullet.Direction = shootDirection.x >= 0 ? 1 : -1;
 
