@@ -13,8 +13,6 @@ public class GameStateManager : MonoBehaviour
 
     private GameOverScreen gameOverScreen;
 
-    int[] arenas = new[] { 0, 1, 2, 3 };
-
     private void Awake()
     {
         if (instance == null)
@@ -72,7 +70,8 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 1;
 
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
-        nextScene = nextScene > arenas[arenas.Length - 1] ? arenas[0] : nextScene;
+
+        nextScene = nextScene >= SceneManager.sceneCountInBuildSettings ? 0 : nextScene;
 
         SceneManager.LoadScene(nextScene);
     }
