@@ -51,7 +51,6 @@ public class SoundController : MonoBehaviour
                 return;
             }
 
-            Debug.Log("Playing " + key);
             audioSource.PlayOneShot(entry.AudioClip);
 
             if (key == SfxIdentifier.BubblePlayerHit && MusicBox.Instance != null)
