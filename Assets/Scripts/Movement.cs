@@ -12,6 +12,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float drag;
     [SerializeField] private float snapForce;
+    [SerializeField] private float rotationForce;
     [SerializeField] private Transform groundCast;
     [SerializeField] private DirectionE initialDirection;
 
@@ -116,11 +117,11 @@ public class Movement : MonoBehaviour
             inputVector = worldMousePosition - (Vector2)transform.position;
         }
 
-        if (inputVector.x > 0.1)
+        if (inputVector.x > 0)
         {
             direction = DirectionE.Right;
         }
-        else if (inputVector.x < -0.1)
+        else if (inputVector.x < 0)
         {
             direction = DirectionE.Left;
         }
@@ -165,11 +166,11 @@ public class Movement : MonoBehaviour
             inputVector = inputActions2.Player.Move.ReadValue<Vector2>();
         }
 
-        float healthSlowdown = Mathf.Lerp(0.6f, 1, (((float)_player.Health.CurrentHealth) / _player.Health.MaxHealth));
+
 
         if (inputVector.x != 0)
         {
-            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce * healthSlowdown, 0));
+            _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
 
             if (_canWalk)
             {
@@ -186,10 +187,10 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed * healthSlowdown)
+        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
         {
             int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
-            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed * healthSlowdown, _playerRigidbody.velocity.y);
+            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
         }
 
         animationManager.PlayerSpeed = _playerRigidbody.velocity.x;

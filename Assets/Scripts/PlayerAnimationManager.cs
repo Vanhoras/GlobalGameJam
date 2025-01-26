@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerAnimationManager : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class PlayerAnimationManager : MonoBehaviour
     private static readonly int s_shoot = Animator.StringToHash("Shoot");
     private static readonly int s_moveDirection = Animator.StringToHash("MoveDirection");
 
+    private float m_lastValidFacingDirectionParameterValue = 0.5f;
+
     public void TriggerShootAnimation()
     {
         _animator.SetTrigger(s_shoot);
@@ -26,7 +29,9 @@ public class PlayerAnimationManager : MonoBehaviour
     private void Update()
     {
         UpdateDirection();
-        _animator.SetFloat(s_facingDirection, CalculateAnimatorDirectionParameter(FacingDirection, IsFacingLeft));
+        var directionValue = CalculateAnimatorDirectionParameter(FacingDirection, IsFacingLeft);
+        
+        _animator.SetFloat(s_facingDirection, directionValue);
         _animator.SetFloat(s_moveSpeed, Mathf.Abs(PlayerSpeed));
         var isMoving = Mathf.Abs(PlayerSpeed) >= 0.1f;
         _animator.SetBool(s_isMoving, isMoving);
@@ -63,19 +68,25 @@ public class PlayerAnimationManager : MonoBehaviour
         //Depending on the angle:
         //If the player is facing left, angles between 90 and 270 are mapped to 1 to 0.
         //If the player is facing right, angles between -90(270) and 90 are mapped to 0 to 1.
+
+        float output = -1;
         
         // Calculate the angle of the direction vector in degrees
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        
 
         // Normalize the angle to a range of [0, 360)
         angle = (angle + 360) % 360;
-
-        if (isFacingLeft)
+        if (Math.Abs(angle - 90) < 1)
+        {
+            output = 1;
+        }
+        else if (isFacingLeft)
         {
             // Map angles between 90 and 270 to the range [1, 0]
             if (angle >= 90 && angle <= 270)
             {
-                return Mathf.InverseLerp(270, 90, angle);
+                output = 1f - (angle - 90f) / 180f; // Linearly interpolate from 1 (at 90) to 0 (at 270)
             }
         }
         else
@@ -87,11 +98,15 @@ public class PlayerAnimationManager : MonoBehaviour
                 {
                     angle -= 360; // Map 270-360 range to -90-0
                 }
-                return Mathf.InverseLerp(-90, 90, angle);
+                output = (angle + 90f) / 180f; // Linearly interpolate from 0 (at -90) to 1 (at 90)
             }
         }
-
-        // Default to 0 for angles outside the mapped range
-        return 0f;
+        
+        if(output == -1)
+            output = m_lastValidFacingDirectionParameterValue;
+        else
+            m_lastValidFacingDirectionParameterValue = output;
+        
+        return output;
     }
 }
