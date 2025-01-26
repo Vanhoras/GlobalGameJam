@@ -38,6 +38,7 @@ public class MenuController : MonoBehaviour
 
         if(_isPlayer1Ready && _isPlayer2Ready)
         {
+            MusicBox.Instance.SwitchToGameplayMusic();
             SceneManager.LoadScene("Arena_01");
         }
     }
