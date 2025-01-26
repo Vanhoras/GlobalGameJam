@@ -14,6 +14,15 @@ public class HeadCollider : MonoBehaviour
 
     public Player Player => _player.Player;
 
+    private Collider2D collider;
+
+    private void Start()
+    {
+        collider = GetComponent<Collider2D>();
+
+        collider.excludeLayers = 1 << 6;
+    }
+
     public void OnBulletHit(Bullet bullet)
     {
         // Player should not be able to hit theirselves
