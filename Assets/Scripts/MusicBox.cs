@@ -48,12 +48,27 @@ public class MusicBox : MonoBehaviour
 
     public void DuckVolume()
     {
+        StopAllCoroutines();
         audioSource.volume = duckVolumeLevelPercentage * originalVolumeLevel;
         Invoke(nameof(RestoreVolume), 0.8f);
     }
     
     public void RestoreVolume()
     {
-        audioSource.volume = originalVolumeLevel;
+        StartCoroutine("SmoothRestoreVolume");
+    }
+
+    public IEnumerator SmoothRestoreVolume()
+    {
+        float addPerSecond = 0.8f;
+
+        while (audioSource.volume < originalVolumeLevel)
+        {
+            audioSource.volume += addPerSecond * Time.deltaTime;
+
+            if (audioSource.volume >= originalVolumeLevel) audioSource.volume = originalVolumeLevel;
+            
+            yield return null;
+        }
     }
 }
