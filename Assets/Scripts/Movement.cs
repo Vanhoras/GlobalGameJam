@@ -1,7 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movement : MonoBehaviour
@@ -16,6 +14,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private float snapForce;
     [SerializeField] private Transform groundCast;
     [SerializeField] private DirectionE initialDirection;
+
+    [SerializeField] private PlayerAnimationManager animationManager;
 
     private PlayerMetadata _player;
 
@@ -129,6 +129,8 @@ public class Movement : MonoBehaviour
             direction = _currentDirection;
         }
 
+        animationManager.FacingDirection = inputVector;
+
         LookAtDirection(direction);
     }
 
@@ -136,6 +138,7 @@ public class Movement : MonoBehaviour
     {
         _currentDirection = direction;
 
+        /*
         if (direction == DirectionE.Left)
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
@@ -144,6 +147,9 @@ public class Movement : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
+        */
+
+        animationManager.IsFacingLeft = _currentDirection == DirectionE.Left;
     }
 
 
@@ -185,6 +191,8 @@ public class Movement : MonoBehaviour
             int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
             _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed * healthSlowdown, _playerRigidbody.velocity.y);
         }
+
+        animationManager.PlayerSpeed = _playerRigidbody.velocity.x;
     }
 
     void OnDrawGizmos()

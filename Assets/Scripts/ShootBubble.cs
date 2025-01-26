@@ -12,6 +12,9 @@ public class ShootBubble : MonoBehaviour
     [SerializeField]
     private PlayerMetadata _player;
 
+    [SerializeField] 
+    private PlayerAnimationManager animationManager;
+
     private void Start()
     {
         inputActions1 = new Player1InputActions();
@@ -71,6 +74,8 @@ public class ShootBubble : MonoBehaviour
         bullet.Direction = shootDirection.x >= 0 ? 1 : -1;
 
         SoundController.Instance.PlaySound(SfxIdentifier.Shoot);
+
+        animationManager.TriggerShootAnimation();
     }
 
 }
