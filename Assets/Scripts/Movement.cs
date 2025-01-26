@@ -173,10 +173,10 @@ public class Movement : MonoBehaviour
 
             if ( velocityPositive && inputVector.x < 0)
             {
-                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 2), _playerRigidbody.velocity.y);
+                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 1), _playerRigidbody.velocity.y);
             } else if (velocityNegative && inputVector.x > 0)
             {
-                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -2), _playerRigidbody.velocity.y);
+                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -1), _playerRigidbody.velocity.y);
             }
 
 
