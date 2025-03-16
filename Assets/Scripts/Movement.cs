@@ -168,37 +168,37 @@ public class Movement : MonoBehaviour
 
         if (inputVector.x != 0)
         {
-            bool velocityPositive = _playerRigidbody.velocity.x > 0;
-            bool velocityNegative = _playerRigidbody.velocity.x < 0;
+            bool velocityPositive = _playerRigidbody.linearVelocity.x > 0;
+            bool velocityNegative = _playerRigidbody.linearVelocity.x < 0;
 
             if ( velocityPositive && inputVector.x < 0)
             {
-                _playerRigidbody.velocity = new Vector2(Mathf.Min(_playerRigidbody.velocity.x, 1), _playerRigidbody.velocity.y);
+                _playerRigidbody.linearVelocity = new Vector2(Mathf.Min(_playerRigidbody.linearVelocity.x, 1), _playerRigidbody.linearVelocity.y);
             } else if (velocityNegative && inputVector.x > 0)
             {
-                _playerRigidbody.velocity = new Vector2(Mathf.Max(_playerRigidbody.velocity.x, -1), _playerRigidbody.velocity.y);
+                _playerRigidbody.linearVelocity = new Vector2(Mathf.Max(_playerRigidbody.linearVelocity.x, -1), _playerRigidbody.linearVelocity.y);
             }
 
 
             _playerRigidbody.AddForce(new Vector2(inputVector.x * walkForce, 0));
         } else
         {
-            if (Mathf.Abs(_playerRigidbody.velocity.x) <= snapForce)
+            if (Mathf.Abs(_playerRigidbody.linearVelocity.x) <= snapForce)
             {
-                _playerRigidbody.velocity = new Vector2(0, _playerRigidbody.velocity.y);
+                _playerRigidbody.linearVelocity = new Vector2(0, _playerRigidbody.linearVelocity.y);
             } else {
-                float dragForce = -1 * drag * _playerRigidbody.velocity.x * _playerRigidbody.velocity.magnitude;
+                float dragForce = -1 * drag * _playerRigidbody.linearVelocity.x * _playerRigidbody.linearVelocity.magnitude;
                 _playerRigidbody.AddForce(new Vector2(dragForce, 0));
             }
         }
 
-        if (Mathf.Abs(_playerRigidbody.velocity.x) >= maxWalkSpeed)
+        if (Mathf.Abs(_playerRigidbody.linearVelocity.x) >= maxWalkSpeed)
         {
-            int direction = _playerRigidbody.velocity.x > 0 ? 1 : -1;
-            _playerRigidbody.velocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.velocity.y);
+            int direction = _playerRigidbody.linearVelocity.x > 0 ? 1 : -1;
+            _playerRigidbody.linearVelocity = new Vector2(direction * maxWalkSpeed, _playerRigidbody.linearVelocity.y);
         }
 
-        animationManager.PlayerSpeed = _playerRigidbody.velocity.x;
+        animationManager.PlayerSpeed = _playerRigidbody.linearVelocity.x;
     }
 
     void OnDrawGizmos()
